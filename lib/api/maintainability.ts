@@ -5,14 +5,7 @@ import { getCylomaticComplexityForSource } from "./cyclomatic";
 import { getHalsteadForSource } from "./halstead";
 import { getSloc } from "./sloc";
 import { Project, StructureKind } from "ts-morph";
-import { mergeObjectPropertiesBasedOnKeys } from "../utils/name";
-
-// initialize
-const project = new Project({
-  // tsConfigFilePath: "./tsconfig.json",
-  // skipAddingFilesFromTsConfig: true,
-});
-project.addSourceFilesAtPaths("lib/**/*.ts");
+import { mergeObjectPropertiesBasedOnKeys } from "../utils";
 
 export const getMaintainabilityForFile = (
   filePath: string,
@@ -23,40 +16,44 @@ export const getMaintainabilityForFile = (
   }
   const sourceText = readFileSync(filePath).toString();
   const source = createSourceFile(filePath, sourceText, target, true);
-  // const sourceFile = project.createSourceFile(filePath, "", {
-  //   overwrite: true,
-  // });
-  const sourceFile = project.createSourceFile(filePath, sourceText, {
-    overwrite: true,
-  });
 
   const perFunctionHalstead = getHalsteadForSource(source);
   const perFunctionCyclomatic = getCylomaticComplexityForSource(source);
-  // console.log(sourceFile);
-  const sourceCodeLength = getSloc(source);
+  const perFunctionLOC = getSloc(source);
 
-  console.log(sourceCodeLength);
+  // const customizer = (objValue, srcValue) => {
+  //   console.log(objValue.volume);
+  //   console.log(srcValue);
+  //   console.log(value);
+  //   if (Object.keys(srcValue).length !== 0) {
+  //     console.log(objValue);
+  //     console.log(srcValue);
+  //     return null;
+  //     // return { volume: .volu, cyclomatic: val };
+  //   }
+  //   return null;
+  // };
+  // const merged = mergeWith(
+  //   perFunctionHalstead,
+  //   perFunctionCyclomatic,
+  //   perFunctionLOC,
+  //   customizer
+  // );
 
-  // console.log(`Source ${JSON.stringify(source)}`);
-  // console.log(`Cyclomatic ${JSON.stringify(perFunctionCyclomatic)}`);
-  // console.log(`Halstead ${JSON.stringify(perFunctionHalstead)}`);
+  const metrics = {};
 
-  const customizer = (src, val) => {
-    if (!!src && Object.keys(src).length !== 0 && !!val) {
-      return { volume: src.volume, cyclomatic: val };
-    }
-    return null;
-  };
-  const merged = mergeWith(
-    perFunctionHalstead,
-    perFunctionCyclomatic,
-    customizer
-  );
+  Object.keys(perFunctionCyclomatic).forEach((functionName) => {
+    metrics[functionName] = {
+      volume: perFunctionHalstead[functionName]?.volume,
+      cyclomatic: perFunctionCyclomatic[functionName],
+      loc: perFunctionLOC[functionName],
+    };
+  });
 
   // console.log(`merged ${JSON.stringify(merged)}`);
-  const perFunctionMerged = omitBy(merged, isNull);
+  // const perFunctionMerged = omitBy(merged, isNull);
 
-  // console.log(perFunctionMerged);
+  console.log(metrics);
 
   // const functions = Object.keys(perFunctionMerged);
   // if (functions.length === 0) {

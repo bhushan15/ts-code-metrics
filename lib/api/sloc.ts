@@ -3,32 +3,21 @@ import {
   getFormattedObj,
   getNodeName,
   getNodePosition,
-  getTsNodePosition,
   mergeObjectPropertiesBasedOnKeys,
-} from "./../utils/name";
+} from "../utils";
 import { isFunctionWithBody } from "tsutils";
 
 export const getSloc = (sourceFile: SourceFile) => {
   const locPerFunction: any = {};
   const functionalityPerPos: any = {};
 
-  // functions.forEach((functionDeclaration) => {
-  //   const loc =
-  //     functionDeclaration.getEndLineNumber() -
-  //     functionDeclaration.getStartLineNumber() +
-  //     1;
-  //   const name = functionDeclaration.getName() || "function";
-  //   locPerFunction[name] = loc;
-  // });
-
-  // console.log(functions);
-
   forEachChild(sourceFile, function cb(node) {
     forEachChild(node, cb);
     if (isFunctionWithBody(node)) {
-      const start = sourceFile.getLineAndCharacterOfPosition(node.getStart());
-      const end = sourceFile.getLineAndCharacterOfPosition(node.getEnd());
-      const loc = end.line + 1 - (start.line + 1);
+      // const start = sourceFile.getLineAndCharacterOfPosition(node.getStart());
+      // const end = sourceFile.getLineAndCharacterOfPosition(node.getEnd());
+      // const loc = end.line + 1 - (start.line + 1);
+      const loc = node.getFullText().split("\n").length;
       const pos = getNodePosition(node);
       const name = getNodeName(node);
       locPerFunction[pos] = loc;
@@ -36,9 +25,8 @@ export const getSloc = (sourceFile: SourceFile) => {
     }
   });
 
-  console.log(locPerFunction);
   return getFormattedObj(
-    mergeObjectPropertiesBasedOnKeys(locPerFunction),
+    mergeObjectPropertiesBasedOnKeys(locPerFunction, true),
     mergeObjectPropertiesBasedOnKeys(functionalityPerPos, true)
   );
 };

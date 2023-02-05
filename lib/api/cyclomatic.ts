@@ -1,4 +1,3 @@
-import { getFormattedObj, getNodeName } from "./../utils/name";
 import {
   BinaryExpression,
   Block,
@@ -14,7 +13,9 @@ import { existsSync, readFileSync } from "fs";
 import {
   getNodePosition,
   mergeObjectPropertiesBasedOnKeys,
-} from "../utils/name";
+  getFormattedObj,
+  getNodeName,
+} from "../utils";
 import { isFunctionWithBody } from "tsutils";
 
 const incrComplexity = (node: Node | Block) => {

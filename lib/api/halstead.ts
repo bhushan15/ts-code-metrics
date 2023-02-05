@@ -17,7 +17,7 @@ import {
   getNodeName,
   getNodePosition,
   mergeObjectPropertiesBasedOnKeys,
-} from "../utils/name";
+} from "../utils";
 import { isFunctionWithBody } from "tsutils";
 
 const isIdentifier = (kind: SyntaxKind) => kind === SyntaxKind.Identifier;
