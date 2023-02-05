@@ -1,3 +1,4 @@
+import { getFormattedObj, getNodeName } from "./../utils/name";
 import {
   BinaryExpression,
   Block,
@@ -10,7 +11,10 @@ import {
 } from "typescript";
 import { existsSync, readFileSync } from "fs";
 
-import { getNodeName } from "../utils/name";
+import {
+  getNodePosition,
+  mergeObjectPropertiesBasedOnKeys,
+} from "../utils/name";
 import { isFunctionWithBody } from "tsutils";
 
 const incrComplexity = (node: Node | Block) => {
@@ -44,15 +48,18 @@ const incrComplexity = (node: Node | Block) => {
 
 export const getCylomaticComplexityForSource = (ctx: SourceFile) => {
   let complexity = 0;
-  const output: any = {};
+  const complexityPerFunc: any = {};
+  const functionalityPerPos: any = {};
   forEachChild(ctx, function cb(node: Node) {
     if (isFunctionWithBody(node)) {
       const old = complexity;
       complexity = 1;
       forEachChild(node, cb);
+      const pos = getNodePosition(node);
       const name = getNodeName(node);
-      output[name] = complexity;
+      complexityPerFunc[pos] = complexity;
       complexity = old;
+      functionalityPerPos[pos] = name;
     } else {
       if (incrComplexity(node)) {
         complexity += 1;
@@ -60,7 +67,11 @@ export const getCylomaticComplexityForSource = (ctx: SourceFile) => {
       forEachChild(node, cb);
     }
   });
-  return output;
+
+  return getFormattedObj(
+    mergeObjectPropertiesBasedOnKeys(complexityPerFunc),
+    mergeObjectPropertiesBasedOnKeys(functionalityPerPos, true)
+  );
 };
 
 export const getCyclomaticComplexityForFile = (
