@@ -20,26 +20,6 @@ export const getMaintainabilityForFile = (
   const perFunctionHalstead = getHalsteadForSource(source);
   const perFunctionCyclomatic = getCylomaticComplexityForSource(source);
   const perFunctionLOC = getSloc(source);
-
-  // const customizer = (objValue, srcValue) => {
-  //   console.log(objValue.volume);
-  //   console.log(srcValue);
-  //   console.log(value);
-  //   if (Object.keys(srcValue).length !== 0) {
-  //     console.log(objValue);
-  //     console.log(srcValue);
-  //     return null;
-  //     // return { volume: .volu, cyclomatic: val };
-  //   }
-  //   return null;
-  // };
-  // const merged = mergeWith(
-  //   perFunctionHalstead,
-  //   perFunctionCyclomatic,
-  //   perFunctionLOC,
-  //   customizer
-  // );
-
   const metrics = {};
 
   Object.keys(perFunctionCyclomatic).forEach((functionName) => {
@@ -49,16 +29,6 @@ export const getMaintainabilityForFile = (
       loc: perFunctionLOC[functionName],
     };
   });
-
-  // console.log(`merged ${JSON.stringify(merged)}`);
-  // const perFunctionMerged = omitBy(merged, isNull);
-
-  console.log(metrics);
-
-  // const functions = Object.keys(perFunctionMerged);
-  // if (functions.length === 0) {
-  //   return { averageMaintainability: -1, minMaintainability: -1 };
-  // }
 
   // const maximumMatrics = reduce(
   //   perFunctionMerged,
