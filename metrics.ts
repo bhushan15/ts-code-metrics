@@ -1,9 +1,8 @@
 import * as tc from "./lib";
 
-import { access, accessSync, constants, fstat, lstatSync, stat } from "fs";
+import { lstatSync } from "fs";
 
 import glob from "glob";
-import path from "path";
 
 const inputArgs = process.argv.slice(2);
 
@@ -11,28 +10,35 @@ const createReport = (files: string[]) => {
   const report: any[] = [];
   files.forEach((file: string) => {
     const metricMaintanability = tc.getMaintainability(file);
-    report.push({
-      file,
-      ...metricMaintanability,
-    });
+    // report.push({
+    //   file,
+    //   ...metricMaintanability,
+    // });
+    report[file] = metricMaintanability;
   });
-  console.table(report);
+  console.log(report);
 };
 
-const GLOBAL_TS_PATTERN: string = "{,!(node_modules)/**/}*.ts";
+// "{,!(node_modules)/**/}*.ts";
+// {,!(node_modules|__mocks__)/**/}*.ts
+const GLOBAL_TS_PATTERN: string =  "/!(node_modules|__mocks__|__snapshots__)//**/*.{ts,tsx,!(.d.ts|.test.ts|.type.ts)}";
+//  "/!(node_modules|__mocks__|__snapshots__)//*.{ts,tsx,!(.d.ts|.test.ts|.type.ts)}";
+// "{,!(node_modules), !(__mocks__)}/**/*[!d].ts";
+// "**/*.ts";
 const createReportWithPathPattern = (
   matchPattern: string = GLOBAL_TS_PATTERN
 ) => {
   console.log(matchPattern);
   const options = {};
 
-  const paternMatchAndCreateReport = (err: Error | null, files: string[]) => {
+  const patternMatchAndCreateReport = (err: Error | null, files: string[]) => {
     if (err) {
       console.error("Some error occured", err);
     }
+    console.log(`files ${files}`);
     createReport(files);
   };
-  glob(matchPattern, options, paternMatchAndCreateReport);
+  glob(matchPattern, options, patternMatchAndCreateReport);
 };
 
 if (inputArgs.length > 0) {
