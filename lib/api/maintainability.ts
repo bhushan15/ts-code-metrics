@@ -4,8 +4,22 @@ import { isNull, mergeWith, omitBy, reduce } from "lodash";
 import { getCylomaticComplexityForSource } from "./cyclomatic";
 import { getHalsteadForSource } from "./halstead";
 import { getSloc } from "./sloc";
-import { Project, StructureKind } from "ts-morph";
 import { mergeObjectPropertiesBasedOnKeys } from "../utils";
+import { ICodeMetrics, IMaintainabilityIndexParams } from "../metrics.type";
+
+const calculateMaintainabilityIndex = (
+  maintainabilityIndexParams: IMaintainabilityIndexParams
+) => {
+  return Math.max(
+    0,
+    ((171 -
+      5.2 * Math.log(maintainabilityIndexParams.halsteadVolume) -
+      0.23 * maintainabilityIndexParams.cyclomaticComplexity -
+      16.2 * Math.log(maintainabilityIndexParams.loc)) *
+      100) /
+      171
+  );
+};
 
 export const getMaintainabilityForFile = (
   filePath: string,
@@ -20,53 +34,21 @@ export const getMaintainabilityForFile = (
   const perFunctionHalstead = getHalsteadForSource(source);
   const perFunctionCyclomatic = getCylomaticComplexityForSource(source);
   const perFunctionLOC = getSloc(source);
-  const metrics = {};
+  const metrics: { [key: string]: string } = {};
 
   Object.keys(perFunctionCyclomatic).forEach((functionName) => {
-    metrics[functionName] = {
-      volume: perFunctionHalstead[functionName]?.volume,
-      cyclomatic: perFunctionCyclomatic[functionName],
+    const maintainabilityIndexParams: IMaintainabilityIndexParams = {
+      halsteadVolume: perFunctionHalstead[functionName]?.volume,
+      cyclomaticComplexity: perFunctionCyclomatic[functionName],
       loc: perFunctionLOC[functionName],
     };
+    metrics[functionName] = JSON.stringify({
+      ...maintainabilityIndexParams,
+      maintainabilityIndex: calculateMaintainabilityIndex(
+        maintainabilityIndexParams
+      ),
+    });
   });
-
-  // const maximumMatrics = reduce(
-  //   perFunctionMerged,
-  //   (result, value) => {
-  //     result.volume = Math.max(result.volume, value.volume);
-  //     result.cyclomatic = Math.max(result.cyclomatic, value.cyclomatic);
-  //     return result;
-  //   },
-  //   perFunctionMerged[functions[0]]
-  // );
-
-  // const averageMatrics = { cyclomatic: 0, volume: 0, n: 0 };
-  // functions.forEach((aFunction) => {
-  //   const matric = perFunctionMerged[aFunction];
-  //   averageMatrics.cyclomatic += matric.cyclomatic;
-  //   averageMatrics.volume += matric.volume;
-  //   averageMatrics.n++;
-  // });
-  // averageMatrics.cyclomatic /= averageMatrics.n;
-  // averageMatrics.volume /= averageMatrics.n;
-
-  // const averageMaintainability = Number.parseFloat(
-  //   (
-  //     171 -
-  //     5.2 * Math.log(averageMatrics.volume) -
-  //     0.23 * averageMatrics.cyclomatic -
-  //     16.2 * Math.log(sourceCodeLength)
-  //   ).toFixed(2)
-  // );
-
-  // const minMaintainability = Number.parseFloat(
-  //   (
-  //     171 -
-  //     5.2 * Math.log(maximumMatrics.volume) -
-  //     0.23 * maximumMatrics.cyclomatic -
-  //     16.2 * Math.log(sourceCodeLength)
-  //   ).toFixed(2)
-  // );
-
-  return { averageMaintainability: 1, minMaintainability: 1 };
+  
+  return metrics;
 };
