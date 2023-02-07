@@ -19,7 +19,7 @@ const createReport = (files: string[]) => {
   console.log(report);
 };
 
-const GLOBAL_TS_PATTERN: string = "{,!(node_modules|__mocks__|__snapshots__)/**/}*[!test][!type][!scss].+(ts|tsx)";
+const GLOBAL_TS_PATTERN: string = "{,!(node_modules|__mocks__|__snapshots__)/**/}*[!test][!type][!.d.].+(ts|tsx)";
 
 const createReportWithPathPattern = (
   matchPattern: string = GLOBAL_TS_PATTERN
