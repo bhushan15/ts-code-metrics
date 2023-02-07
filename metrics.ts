@@ -7,8 +7,7 @@ import glob from "glob";
 const inputArgs = process.argv.slice(2);
 
 const createReport = (files: string[]) => {
-  const report: any[] = [];
-  console.log(files);
+  const report = {};
   files.forEach((file: string) => {
     const metricMaintanability = tc.getMaintainability(file);
     // report.push({
@@ -20,17 +19,8 @@ const createReport = (files: string[]) => {
   console.log(report);
 };
 
-//Impt
-// *!(node_modules|__mocks__|__snapshots__)!(*.d.ts|*.test.ts)
-
-// "{,!(node_modules)/**/}*.ts";
-// {,!(node_modules|__mocks__)/**/}*.ts
 const GLOBAL_TS_PATTERN: string = "{,!(node_modules|__mocks__|__snapshots__)/**/}*[!test][!type][!scss].+(ts|tsx)";
-//"{,!(node_modules|__mocks__|__snapshots__)/**/}*[!test][!type][!scss.d]*(ts|tsx)" 
-// "/!(node_modules|__mocks__|__snapshots__)//**/*.{ts,tsx,!(.d.ts|.test.ts|.type.ts)}";
-//  "/!(node_modules|__mocks__|__snapshots__)//*.{ts,tsx,!(.d.ts|.test.ts|.type.ts)}";
-// "{,!(node_modules), !(__mocks__)}/**/*[!d].ts";
-// "**/*.ts";
+
 const createReportWithPathPattern = (
   matchPattern: string = GLOBAL_TS_PATTERN
 ) => {
@@ -41,7 +31,6 @@ const createReportWithPathPattern = (
     if (err) {
       console.error("Some error occured", err);
     }
-    console.log(`files ${files}`);
     createReport(files);
   };
   glob(matchPattern, options, patternMatchAndCreateReport);
