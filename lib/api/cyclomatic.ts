@@ -15,6 +15,7 @@ import {
   mergeObjectPropertiesBasedOnKeys,
   getFormattedObj,
   getNodeName,
+  getParentNodeClassName,
 } from "../utils";
 import { isFunctionWithBody } from "tsutils";
 
@@ -57,7 +58,11 @@ export const getCylomaticComplexityForSource = (ctx: SourceFile) => {
       complexity = 1;
       forEachChild(node, cb);
       const pos = getNodePosition(node);
-      const name = getNodeName(node);
+      let name = getNodeName(node);
+
+      const parentNodeClassName = getParentNodeClassName(node);
+      name = parentNodeClassName ? `${parentNodeClassName}.${name}` : name;
+
       complexityPerFunc[pos] = complexity;
       complexity = old;
       functionalityPerPos[pos] = name;

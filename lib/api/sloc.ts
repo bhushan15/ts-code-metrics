@@ -3,6 +3,7 @@ import {
   getFormattedObj,
   getNodeName,
   getNodePosition,
+  getParentNodeClassName,
   mergeObjectPropertiesBasedOnKeys,
 } from "../utils";
 import { isFunctionWithBody } from "tsutils";
@@ -14,12 +15,12 @@ export const getSloc = (sourceFile: SourceFile) => {
   forEachChild(sourceFile, function cb(node) {
     forEachChild(node, cb);
     if (isFunctionWithBody(node)) {
-      // const start = sourceFile.getLineAndCharacterOfPosition(node.getStart());
-      // const end = sourceFile.getLineAndCharacterOfPosition(node.getEnd());
-      // const loc = end.line + 1 - (start.line + 1);
       const loc = node.getFullText().split("\n").length;
       const pos = getNodePosition(node);
-      const name = getNodeName(node);
+      let name = getNodeName(node);
+
+      const parentNodeClassName = getParentNodeClassName(node);
+      name = parentNodeClassName ? `${parentNodeClassName}.${name}` : name;
       locPerFunction[pos] = loc;
       functionalityPerPos[pos] = name;
     }

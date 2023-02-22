@@ -4,8 +4,7 @@ import { isNull, mergeWith, omitBy, reduce } from "lodash";
 import { getCylomaticComplexityForSource } from "./cyclomatic";
 import { getHalsteadForSource } from "./halstead";
 import { getSloc } from "./sloc";
-import { mergeObjectPropertiesBasedOnKeys } from "../utils";
-import { ICodeMetrics, IMaintainabilityIndexParams } from "../metrics.type";
+import { IMaintainabilityIndexParams } from "../metrics.type";
 
 const calculateMaintainabilityIndex = (
   maintainabilityIndexParams: IMaintainabilityIndexParams

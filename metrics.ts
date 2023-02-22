@@ -1,3 +1,4 @@
+import { isEmpty } from './lib/utils/object';
 import * as tc from "./lib";
 
 import { lstatSync } from "fs";
@@ -10,11 +11,10 @@ const createReport = (files: string[]) => {
   const report = {};
   files.forEach((file: string) => {
     const metricMaintanability = tc.getMaintainability(file);
-    // report.push({
-    //   file,
-    //   ...metricMaintanability,
-    // });
-    report[file] = metricMaintanability;
+
+    if (!isEmpty(metricMaintanability)) {
+      report[file] = metricMaintanability;
+    }
   });
   console.log(report);
 };

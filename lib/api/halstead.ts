@@ -16,6 +16,7 @@ import {
   getFormattedObj,
   getNodeName,
   getNodePosition,
+  getParentNodeClassName,
   mergeObjectPropertiesBasedOnKeys,
 } from "../utils";
 import { isFunctionWithBody } from "tsutils";
@@ -105,7 +106,11 @@ export const getHalsteadForSource = (ctx) => {
   forEachChild(ctx, function cb(node) {
     if (isFunctionWithBody(node)) {
       const pos = getNodePosition(node);
-      const name = getNodeName(node);
+      let name = getNodeName(node);
+
+      const parentNodeClassName = getParentNodeClassName(node);
+      name = parentNodeClassName ? `${parentNodeClassName}.${name}` : name;
+
       halsteadPerFunc[pos] = getHalsteadForNode(node);
       functionalityPerPos[pos] = name;
     }

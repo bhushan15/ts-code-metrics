@@ -1,4 +1,4 @@
-import { getCyclomaticComplexityForFile, getHalsteadForFile, getHalsteadForSource, getMaintainabilityForFile } from './api'
+import { getCyclomaticComplexityForFile, getHalsteadForFile, getMaintainabilityForFile } from './api'
 
 import { ScriptTarget } from 'typescript';
 
